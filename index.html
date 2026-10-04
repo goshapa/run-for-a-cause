@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Run for a Cause</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Dela+Gothic+One&family=Poppins:wght@400;600;800&family=Zen+Maru+Gothic:wght@500;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b2a22; --bg2:#103d31; --green:#1fbf8f; --mint:#9bffd9;
+  --pink:#ff7eb6; --pink2:#ffc2dd; --sun:#ffb347; --red:#ff4d6d; --sky:#6ec8ff;
+  --ink:#fff; --muted:#bfe9da;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Poppins','Zen Maru Gothic',sans-serif}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bgglow{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60vw 60vw at 85% 10%,rgba(255,126,182,.22),transparent 60%),
+  radial-gradient(55vw 55vw at 5% 95%,rgba(31,191,143,.28),transparent 60%),
+  linear-gradient(160deg,var(--bg),var(--bg2));transition:filter .8s}
+/* speed lines */
+.speed{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.07) 0 .6deg,transparent .6deg 6deg);
+  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 28%,#000 75%);mask:radial-gradient(circle at 50% 50%,transparent 28%,#000 75%);
+  animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg) scale(1.3)}}
+.deck{position:fixed;inset:0;z-index:2}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 7vw;
+  opacity:0;visibility:hidden;transform:scale(1.04);transition:opacity .7s,transform .7s,visibility 0s .7s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .7s,transform .7s}
+.slide.leaving{transform:scale(.96) translateX(-4vw)}
+/* wipe */
+.wipe{position:fixed;inset:0;z-index:50;pointer-events:none;display:flex}
+.wipe i{flex:1;background:linear-gradient(var(--pink),var(--sun));transform:translateY(-101%);}
+.wipe.go i{animation:wipe .9s cubic-bezier(.7,0,.2,1) forwards;animation-delay:calc(var(--n)*35ms)}
+@keyframes wipe{0%{transform:translateY(-101%)}45%{transform:translateY(0)}55%{transform:translateY(0)}100%{transform:translateY(101%)}}
+
+/* reveal */
+.slide .r{opacity:0;transform:translateY(40px) skewY(3deg);}
+.slide.active .r{animation:pop .8s cubic-bezier(.2,1.3,.4,1) forwards;animation-delay:calc(var(--d,0)*120ms + .35s)}
+@keyframes pop{to{opacity:1;transform:none}}
+.kicker{font-family:'Bangers';letter-spacing:.2em;color:var(--pink);font-size:clamp(14px,1.6vw,24px);display:flex;align-items:center;gap:.8em}
+.kicker::before{content:"";width:3em;height:3px;background:linear-gradient(90deg,var(--pink),transparent)}
+h1,h2{font-family:'Dela Gothic One','Poppins';line-height:1.02;text-transform:uppercase}
+h2{font-size:clamp(28px,4.6vw,72px);margin:.25em 0 .2em;text-shadow:4px 4px 0 rgba(255,126,182,.55)}
+h2 em{font-style:normal;color:var(--sun)}
+.sub{color:var(--muted);font-size:clamp(14px,1.5vw,22px);max-width:60ch;margin-bottom:3vh}
+.kanji{position:absolute;font-family:'Dela Gothic One',serif;font-size:42vh;line-height:1;color:transparent;-webkit-text-stroke:2px rgba(255,126,182,.22);right:3vw;top:4vh;z-index:-1;user-select:none}
+.kanji.l{right:auto;left:2vw;top:auto;bottom:0}
+
+/* title */
+.title{align-items:flex-start}
+.title h1{font-size:clamp(48px,9vw,150px);position:relative;z-index:2;color:#fff;text-shadow:6px 6px 0 var(--pink),12px 12px 0 rgba(0,0,0,.25);letter-spacing:-.02em}
+.title h1 span{display:block}
+.title h1 .b{color:var(--sun);transform:skewX(-8deg);display:inline-block}
+.glitch{position:relative}
+.glitch::after{content:attr(data-t);position:absolute;left:0;top:0;color:var(--sky);mix-blend-mode:screen;clip-path:inset(0 0 60% 0);animation:gl 3s infinite steps(1)}
+@keyframes gl{0%,92%,100%{transform:none;opacity:0}93%{transform:translate(-6px,2px);opacity:1}95%{transform:translate(5px,-2px);opacity:1}97%{transform:translate(-3px,0);opacity:1}}
+.tagline{font-size:clamp(16px,2vw,30px);margin:2vh 0;max-width:30ch;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:2vh}
+.chip{padding:.5em 1em;border-radius:99px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);font-size:clamp(12px,1.2vw,18px);transition:.3s}
+.chip:hover{background:var(--pink);color:#0b2a22;transform:translateY(-4px) rotate(-3deg)}
+.stamp{font-family:'Bangers';letter-spacing:.15em;color:var(--sun);border:3px solid var(--sun);display:inline-block;padding:.2em .7em;transform:rotate(-4deg);margin-bottom:2vh}
+.runner-wrap{position:absolute;right:6vw;bottom:8vh;width:min(32vw,460px);z-index:1;filter:drop-shadow(0 20px 30px rgba(0,0,0,.4))}
+.runner-wrap svg{width:100%;overflow:visible}
+.ground{position:absolute;left:0;right:0;bottom:7vh;height:6px;background:repeating-linear-gradient(90deg,var(--mint) 0 40px,transparent 40px 80px);opacity:.5;animation:gr .5s linear infinite}
+@keyframes gr{to{background-position:-80px 0}}
+
+/* runner limbs */
+.bob{animation:bob .5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.limb{transform-box:view-box}
+.armA{animation:swA .5s ease-in-out infinite alternate}
+.armB{animation:swA .5s ease-in-out infinite alternate-reverse}
+.legA{animation:swL .5s ease-in-out infinite alternate}
+.legB{animation:swL .5s ease-in-out infinite alternate-reverse}
+@keyframes swA{from{transform:rotate(-40deg)}to{transform:rotate(40deg)}}
+@keyframes swL{from{transform:rotate(-38deg)}to{transform:rotate(38deg)}}
+@keyframes knA{from{transform:rotate(5deg)}to{transform:rotate(-75deg)}}
+.shinA{animation:knA .5s ease-in-out infinite alternate-reverse}
+.shinB{animation:knA .5s ease-in-out infinite alternate}
+.elb{animation:elb .5s ease-in-out infinite alternate}
+@keyframes elb{from{transform:rotate(-70deg)}to{transform:rotate(-70deg)}}
+.band{transform-box:fill-box;transform-origin:left center;animation:flap .25s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(-10deg) scaleX(1)}to{transform:rotate(14deg) scaleX(1.15)}}
+.hairf{transform-box:fill-box;transform-origin:left center;animation:flap .3s ease-in-out infinite alternate}
+
+/* pillars */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;margin-top:2vh}
+.card{position:relative;padding:3vh 2vw;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);transition:transform .35s cubic-bezier(.2,1.5,.4,1),border-color .3s,box-shadow .3s;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.25) 50%,transparent 65%);transform:translateX(-120%);transition:transform .8s}
+.card:hover{transform:translateY(-14px) rotate(-1.5deg);border-color:var(--pink);box-shadow:0 20px 50px rgba(255,126,182,.3)}
+.card:hover::before{transform:translateX(120%)}
+.card .ico{font-size:clamp(40px,5vw,76px);display:block;animation:fl 3s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-8px) rotate(6deg)}}
+.card .pl{font-family:'Bangers';letter-spacing:.2em;color:var(--pink)}
+.card h3{font-family:'Dela Gothic One';font-size:clamp(20px,2.4vw,38px);margin:.3em 0;color:var(--sun)}
+.card p{color:var(--muted);font-size:clamp(13px,1.2vw,18px);line-height:1.5}
+.card .hl{margin-top:1em;font-weight:800;font-size:clamp(12px,1.1vw,16px)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6vw;margin-top:3vh}
+.stat{position:relative;padding:4vh 1.2vw;text-align:center;background:#fff;color:#0b2a22;border:4px solid #0b2a22;box-shadow:8px 8px 0 var(--pink);transform:rotate(var(--rot,-1.5deg));clip-path:polygon(0 3%,4% 0,100% 2%,98% 100%,3% 97%);transition:.3s}
+.stat:nth-child(even){--rot:1.5deg;box-shadow:8px 8px 0 var(--sun)}
+.stat:hover{transform:rotate(0) scale(1.06)}
+.stat b{display:block;font-family:'Bangers';font-size:clamp(40px,6vw,96px);line-height:1;color:var(--red)}
+.stat span{font-size:clamp(11px,1.1vw,16px);font-weight:600}
+.note{margin-top:3vh;color:var(--muted);font-size:clamp(11px,1.1vw,16px);font-style:italic}
+
+/* path */
+.path{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:1vw;margin-top:5vh}
+.path::before{content:"";position:absolute;left:4%;right:4%;top:34px;height:6px;border-radius:9px;background:rgba(255,255,255,.15)}
+.path::after{content:"";position:absolute;left:4%;top:34px;height:6px;border-radius:9px;background:linear-gradient(90deg,var(--pink),var(--sun));width:0}
+.slide.active .path::after{animation:fill 2.4s .8s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes fill{to{width:92%}}
+.step{position:relative;text-align:center;padding-top:0}
+.step .n{width:70px;height:70px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-family:'Bangers';font-size:32px;color:#0b2a22;background:linear-gradient(135deg,var(--pink2),var(--pink));border:4px solid #fff;box-shadow:0 0 0 0 rgba(255,126,182,.6);animation:pulse 2.4s infinite;animation-delay:calc(var(--i)*.3s)}
+@keyframes pulse{70%{box-shadow:0 0 0 18px rgba(255,126,182,0)}100%{box-shadow:0 0 0 0 rgba(255,126,182,0)}}
+.step .em{font-size:clamp(24px,3vw,44px)}
+.step h4{font-family:'Dela Gothic One';color:var(--sun);font-size:clamp(14px,1.6vw,24px);margin:.2em 0}
+.step p{font-size:clamp(11px,1vw,15px);color:var(--muted);line-height:1.4}
+.step:hover .n{transform:scale(1.2) rotate(15deg)}
+.banner{margin-top:4vh;font-family:'Bangers';letter-spacing:.25em;color:var(--pink);font-size:clamp(12px,1.3vw,20px)}
+
+/* team */
+.team{display:grid;grid-template-columns:repeat(5,1fr);gap:1.4vw;margin-top:3vh}
+.mem{text-align:center;padding:2.5vh 1vw;border-radius:20px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.mem:hover{transform:translateY(-12px) scale(1.04);background:rgba(255,126,182,.18);border-color:var(--pink)}
+.avatar{width:clamp(70px,8vw,120px);aspect-ratio:1;border-radius:50%;margin:0 auto 1.2vh;display:grid;place-items:center;font-size:clamp(34px,4vw,60px);background:conic-gradient(from 0deg,var(--pink),var(--sun),var(--green),var(--sky),var(--pink));position:relative;animation:ring 8s linear infinite}
+.avatar::after{content:attr(data-e);position:absolute;inset:5px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;animation:ring 8s linear infinite reverse}
+@keyframes ring{to{transform:rotate(360deg)}}
+.mem h4{font-family:'Dela Gothic One';font-size:clamp(13px,1.4vw,21px)}
+.mem .role{font-family:'Bangers';letter-spacing:.12em;color:var(--pink);font-size:clamp(11px,1.1vw,16px);margin:.4em 0}
+.mem p{font-size:clamp(10px,.95vw,14px);color:var(--muted);line-height:1.4}
+
+/* timeline */
+.tl{display:grid;gap:1.8vh;margin-top:2vh;max-width:1100px}
+.week{display:flex;gap:1.6vw;align-items:center;padding:1.6vh 1.6vw;border-radius:18px;background:rgba(255,255,255,.07);border-left:8px solid var(--pink);transition:.35s}
+.week:nth-child(2){border-color:var(--sun)}.week:nth-child(3){border-color:var(--green)}.week:nth-child(4){border-color:var(--sky)}
+.week:hover{transform:translateX(18px);background:rgba(255,255,255,.14)}
+.week .wn{font-family:'Bangers';font-size:clamp(34px,4.6vw,70px);color:var(--pink);line-height:1;min-width:1.5em}
+.week h4{font-family:'Dela Gothic One';font-size:clamp(14px,1.6vw,24px);color:var(--sun)}
+.week p{font-size:clamp(11px,1.05vw,16px);color:var(--muted);margin-top:.2em;line-height:1.4}
+
+/* money */
+.money{display:flex;flex-direction:column;align-items:center;text-align:center}
+.big{font-family:'Bangers';font-size:clamp(50px,11vw,170px);line-height:1;color:var(--sun);text-shadow:5px 5px 0 var(--pink),10px 10px 0 rgba(0,0,0,.3);margin:.1em 0}
+.eq{display:flex;gap:1vw;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Dela Gothic One';font-size:clamp(14px,2vw,30px);margin:1vh 0}
+.eq .tok{padding:.4em .9em;border-radius:14px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3)}
+.eq .op{color:var(--pink)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1vw;flex-wrap:wrap;margin:2.5vh 0}
+.flow div{padding:.7em 1.2em;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--sun));color:#0b2a22;font-weight:800;font-size:clamp(11px,1.2vw,18px);position:relative}
+.flow i{font-style:normal;color:var(--pink);font-size:clamp(18px,2vw,30px);animation:nudge 1s infinite}
+@keyframes nudge{50%{transform:translateX(8px)}}
+.pts{display:grid;gap:1vh;max-width:760px;margin:1vh auto}
+.pts p{padding:.8em 1.2em;border-radius:14px;background:rgba(255,255,255,.08);font-size:clamp(12px,1.2vw,18px)}
+.burst{position:absolute;left:3vw;top:8vh;width:min(20vw,260px);aspect-ratio:1;display:grid;place-items:center;font-family:'Bangers';font-size:clamp(28px,4vw,60px);color:#0b2a22;background:var(--sun);clip-path:polygon(50% 0,60% 18%,80% 7%,78% 28%,100% 30%,86% 48%,100% 65%,78% 68%,82% 90%,62% 82%,50% 100%,40% 82%,20% 92%,22% 70%,0 66%,14% 48%,0 30%,22% 28%,20% 8%,40% 18%);animation:bu 1.4s ease-in-out infinite alternate;transform:rotate(-12deg)}
+@keyframes bu{to{transform:rotate(8deg) scale(1.12)}}
+
+/* lists */
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:2vw;margin-top:2vh}
+.tile{display:flex;gap:1.2vw;align-items:flex-start;padding:2.6vh 1.6vw;border-radius:20px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.16);transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.tile:hover{transform:scale(1.04) rotate(-1deg);border-color:var(--sun);background:rgba(255,179,71,.14)}
+.tile .ti{font-size:clamp(30px,3.6vw,54px)}
+.tile h4{font-family:'Dela Gothic One';color:var(--sun);font-size:clamp(14px,1.6vw,24px)}
+.tile p{font-size:clamp(11px,1.1vw,16px);color:var(--muted);margin-top:.3em;line-height:1.45}
+.end{text-align:center;align-items:center}
+.end h2{font-size:clamp(40px,9vw,140px)}
+.cta{display:inline-block;margin-top:3vh;padding:.8em 2em;font-family:'Bangers';letter-spacing:.2em;font-size:clamp(18px,2.2vw,34px);color:#0b2a22;background:linear-gradient(135deg,var(--pink),var(--sun));border-radius:99px;box-shadow:0 8px 0 #b24a7a;animation:cta 1.2s ease-in-out infinite alternate;cursor:pointer;border:0}
+@keyframes cta{to{transform:translateY(-8px) scale(1.06)}}
+
+/* HUD */
+.hud{position:fixed;z-index:60;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:12px 24px;font-family:'Bangers';letter-spacing:.15em;pointer-events:none}
+.bar{flex:1;height:8px;background:rgba(255,255,255,.15);border-radius:9px;position:relative;overflow:visible}
+.bar b{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,var(--pink),var(--sun));transition:width .6s}
+.bar span{position:absolute;top:-22px;transform:translateX(-50%);font-size:22px;transition:left .6s;filter:drop-shadow(0 2px 2px #0006)}
+.nav{pointer-events:auto;display:flex;gap:8px}
+.nav button{width:40px;height:40px;border-radius:50%;border:2px solid #fff6;background:#ffffff14;color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(6px);transition:.2s}
+.nav button:hover{background:var(--pink);color:#0b2a22;transform:scale(1.15)}
+.cnt{color:var(--pink2);min-width:64px;text-align:right}
+@media(max-width:820px){
+  .cards,.grid2{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .team{grid-template-columns:repeat(2,1fr)}
+  .path{grid-template-columns:repeat(3,1fr);row-gap:3vh}.path::before,.path::after{display:none}
+  .runner-wrap{opacity:.35;width:70vw}
+  .slide{padding:5vh 6vw 14vh;overflow:auto;justify-content:flex-start}
+  .step .n{width:48px;height:48px;font-size:24px}
+  .runner-wrap{bottom:12vh}
+  .burst{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div class="bgglow"></div>
+<div class="speed"></div>
+<canvas id="fx"></canvas>
+<div class="wipe" id="wipe"></div>
+
+<main class="deck" id="deck">
+
+<!-- 1 TITLE -->
+<section class="slide title active">
+  <div class="kanji">走</div>
+  <div class="stamp r" style="--d:0">SERVICE PROJECT PROPOSAL · 2026</div>
+  <h1 class="r" style="--d:1"><span class="glitch" data-t="RUN FOR">RUN FOR</span><span class="b">A CAUSE!</span></h1>
+  <p class="tagline r" style="--d:3">A Community Charity Run for a Verified Beneficiary</p>
+  <div class="chips r" style="--d:4">
+    <span class="chip">Akdidar Tokhtabayeva</span><span class="chip">Firdavs</span><span class="chip">Gulomjon</span><span class="chip">Saidsamirhon</span><span class="chip">Abdu Majid</span>
+  </div>
+  <p class="note r" style="--d:5">Student charity initiative · University service project</p>
+  <div class="ground"></div>
+  <div class="runner-wrap" id="runner1"></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kanji">心</div>
+  <div class="kicker r">MISSION 01</div>
+  <h2 class="r" style="--d:1">Run Together.<br><em>Give Back.</em></h2>
+  <div class="grid2">
+    <div class="tile r" style="--d:2"><span class="ti">🏃</span><div><h4>3 km &amp; 5 km</h4><p>Community charity run with two distance options for every level.</p></div></div>
+    <div class="tile r" style="--d:3"><span class="ti">💖</span><div><h4>Suggested contribution</h4><p>A charitable contribution from each participant.</p></div></div>
+    <div class="tile r" style="--d:4"><span class="ti">🎯</span><div><h4>100% donated</h4><p>Everything collected goes to one verified beneficiary.</p></div></div>
+    <div class="tile r" style="--d:5"><span class="ti">🌱</span><div><h4>Zero upfront cost</h4><p>Designed to need no significant investment from organizers.</p></div></div>
+  </div>
+  <div class="flow r" style="--d:6"><div>RUN</div><i>▶</i><div>COLLECT</div><i>▶</i><div>DONATE</div><i>▶</i><div>REPORT</div></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kanji l">絆</div>
+  <div class="kicker r">POWER-UP</div>
+  <h2 class="r" style="--d:1">A charity run turns <em>movement</em> into service</h2>
+  <p class="sub r" style="--d:2">Combining personal health with social responsibility to generate tangible support for someone facing hardship.</p>
+  <div class="cards">
+    <div class="card r" style="--d:3"><span class="ico">🤝</span><div class="pl">PILLAR 01</div><h3>Community</h3><p>Bring students and young people together in a shared, positive environment outside the lecture hall.</p><p class="hl">★ Student mobilization and campus outreach.</p></div>
+    <div class="card r" style="--d:4"><span class="ico">💪</span><div class="pl">PILLAR 02</div><h3>Health</h3><p>Encourage regular physical activity, wellbeing, and active outdoor lifestyles across campus.</p><p class="hl">★ Accessible physical activity for all levels.</p></div>
+    <div class="card r" style="--d:5"><span class="ico">🔍</span><div class="pl">PILLAR 03</div><h3>Service &amp; Accountability</h3><p>Turn participation into direct aid for someone in need, fully documenting collected funds and donation receipts.</p><p class="hl">★ Full financial audit and proof of transfer.</p></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kanji">目標</div>
+  <div class="kicker r">STATUS SCREEN</div>
+  <h2 class="r" style="--d:1">Measurable <em>objectives</em></h2>
+  <div class="stats">
+    <div class="stat r" style="--d:2"><b data-count="50">50</b><span>Target participants</span></div>
+    <div class="stat r" style="--d:3"><b>3 / 5</b><span>km — two possible running distances</span></div>
+    <div class="stat r" style="--d:4"><b data-count="30000" data-fmt="1">30,000</b><span>UZS proposed minimum contribution per participant</span></div>
+    <div class="stat r" style="--d:5"><b data-count="100" data-suf="%">100%</b><span>Of collected contributions donated to the verified beneficiary</span></div>
+  </div>
+  <p class="note r" style="--d:6">Proposed targets can be adjusted after the beneficiary, location, and event format are confirmed.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kanji">道</div>
+  <div class="kicker r">THE QUEST</div>
+  <h2 class="r" style="--d:1">From registration <em>to impact</em></h2>
+  <p class="sub r" style="--d:2">A rigorous, step-by-step workflow ensuring total transparency from planning through reporting.</p>
+  <div class="path">
+    <div class="step r" style="--d:3;--i:0"><div class="n">1</div><div class="em">🔎</div><h4>Verify</h4><p>Select and verify a beneficiary who genuinely needs support.</p></div>
+    <div class="step r" style="--d:4;--i:1"><div class="n">2</div><div class="em">📝</div><h4>Register</h4><p>Deploy a free Google Form and track runner sign-ups.</p></div>
+    <div class="step r" style="--d:5;--i:2"><div class="n">3</div><div class="em">📣</div><h4>Promote</h4><p>Leverage Instagram, Telegram, and student channels.</p></div>
+    <div class="step r" style="--d:6;--i:3"><div class="n">4</div><div class="em">👟</div><h4>Run</h4><p>Execute the organized 3 km / 5 km community event.</p></div>
+    <div class="step r" style="--d:7;--i:4"><div class="n">5</div><div class="em">💸</div><h4>Donate</h4><p>Calculate collections and wire 100% to the recipient.</p></div>
+    <div class="step r" style="--d:8;--i:5"><div class="n">6</div><div class="em">📜</div><h4>Report</h4><p>Publish final transfer proof and the project audit.</p></div>
+  </div>
+  <div class="banner r" style="--d:9">OPERATING STANDARD · END-TO-END GOVERNANCE MODEL</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kanji l">仲間</div>
+  <div class="kicker r">PARTY MEMBERS</div>
+  <h2 class="r" style="--d:1">Five roles. <em>One accountable team.</em></h2>
+  <div class="team">
+    <div class="mem r" style="--d:2"><div class="avatar" data-e="👑"></div><h4>Akdidar Tokhtabayeva</h4><div class="role">PROJECT COORDINATOR</div><p>Coordinate the project, beneficiary communication, deadlines, team, and final report.</p></div>
+    <div class="mem r" style="--d:3"><div class="avatar" data-e="📋"></div><h4>Firdavs</h4><div class="role">REGISTRATION LEAD</div><p>Build the form, maintain the participant list, and manage event-day registration.</p></div>
+    <div class="mem r" style="--d:4"><div class="avatar" data-e="💰"></div><h4>Gulomjon</h4><div class="role">FINANCE &amp; TRANSPARENCY LEAD</div><p>Track contributions and document the donation transfer.</p></div>
+    <div class="mem r" style="--d:5"><div class="avatar" data-e="📸"></div><h4>Saidsamirhon</h4><div class="role">MARKETING &amp; MEDIA LEAD</div><p>Create promotion, manage communication, and capture media.</p></div>
+    <div class="mem r" style="--d:6"><div class="avatar" data-e="🧭"></div><h4>Abdu Majid</h4><div class="role">OPERATIONS &amp; ROUTE LEAD</div><p>Select the route and coordinate start, finish, safety, and logistics.</p></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kanji">週</div>
+  <div class="kicker r">STAGE MAP</div>
+  <h2 class="r" style="--d:1">Four weeks <em>from plan to run</em></h2>
+  <p class="sub r" style="--d:2">A structured 28-day timeline driving the initiative from initial vetting through public reporting.</p>
+  <div class="tl">
+    <div class="week r" style="--d:3"><div class="wn">01</div><div><h4>Week 1 · Foundation &amp; Planning</h4><p>Select and verify the beneficiary, explore park routes, inspect course terrain, and confirm final event format.</p></div></div>
+    <div class="week r" style="--d:4"><div class="wn">02</div><div><h4>Week 2 · Registration &amp; Promotion</h4><p>Launch the registration form, publish digital posters, initiate campus outreach, and begin collecting contributions.</p></div></div>
+    <div class="week r" style="--d:5"><div class="wn">03</div><div><h4>Week 3 · Preparation &amp; Logistics</h4><p>Confirm participant rosters, finalize safety marshaling points, verify volunteer duties, and print check-in lists.</p></div></div>
+    <div class="week r" style="--d:6"><div class="wn">04</div><div><h4>Week 4 · Charity Run &amp; Impact</h4><p>Check in runners, conduct the 3k/5k event, calculate total funds, execute the full donation transfer, and publish the final report.</p></div></div>
+  </div>
+  <div class="banner r" style="--d:7">PROJECT SCHEDULE · FOUR-WEEK OPERATIONAL MILESTONES</div>
+</section>
+
+<!-- 8 -->
+<section class="slide money">
+  <div class="burst r" style="--d:2">100%!</div>
+  <div class="kicker r">TREASURE</div>
+  <h2 class="r" style="--d:1">Simple, <em>transparent</em> fundraising</h2>
+  <div class="big r" style="--d:2"><span data-count="1500000" data-fmt="1">1,500,000</span> <small style="font-size:.4em">UZS</small></div>
+  <p class="sub r" style="--d:3;margin:0">Illustrative fundraising target</p>
+  <div class="eq r" style="--d:4"><span class="tok">50 participants</span><span class="op">×</span><span class="tok">30,000 UZS</span><span class="op">=</span><span class="tok" style="background:var(--pink);color:#0b2a22">1,500,000 UZS</span></div>
+  <div class="flow r" style="--d:5"><div>Participants</div><i>▶</i><div>Charity Run</div><i>▶</i><div>Collected Contributions</div><i>▶</i><div>Verified Beneficiary</div></div>
+  <div class="pts r" style="--d:6"><p>✅ No required personal investment, paid advertising, or unnecessary event expenses</p><p>🧾 Record all contributions, donate 100%, and keep evidence of the final transfer</p></div>
+  <p class="note r" style="--d:7">This is an illustrative fundraising target, not a guarantee.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kanji">無料</div>
+  <div class="kicker r">FREE EQUIPMENT</div>
+  <h2 class="r" style="--d:1">Build the event with <em>free resources</em></h2>
+  <div class="grid2" style="grid-template-columns:1fr 1fr;margin-top:4vh">
+    <div class="tile r" style="--d:2"><span class="ti">💻</span><div><h4>Digital</h4><p>Google Forms, Google Sheets, Canva Free, Instagram, Telegram</p></div></div>
+    <div class="tile r" style="--d:3"><span class="ti">🏞️</span><div><h4>Event</h4><p>Public running location subject to permission, personal phones, volunteer organizers, basic registration list</p></div></div>
+  </div>
+  <div class="pts r" style="--d:4;margin:3vh 0 0;max-width:none"><p>⚠️ Confirm that the chosen location allows the activity and is safe for participants before the event</p></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kanji">安全</div>
+  <div class="kicker r">SAFETY FIRST</div>
+  <h2 class="r" style="--d:1">Safety <em>comes first</em></h2>
+  <div class="grid2">
+    <div class="tile r" style="--d:2"><span class="ti">🚦</span><div><h4>Safe route</h4><p>Stay away from dangerous traffic areas.</p></div></div>
+    <div class="tile r" style="--d:3"><span class="ti">✅</span><div><h4>Location approval</h4><p>Confirm that the chosen location permits the activity.</p></div></div>
+    <div class="tile r" style="--d:4"><span class="ti">📢</span><div><h4>Participant briefing</h4><p>Explain the route and basic safety instructions before the start.</p></div></div>
+    <div class="tile r" style="--d:5"><span class="ti">🙋</span><div><h4>Voluntary participation</h4><p>Run only if physically able to do so.</p></div></div>
+    <div class="tile r" style="--d:6"><span class="ti">🚑</span><div><h4>Emergency information</h4><p>Keep emergency contacts available.</p></div></div>
+    <div class="tile r end-tile" style="--d:7;justify-content:center;align-items:center"><button class="cta" id="finish">LET'S RUN! 🌸</button></div>
+  </div>
+</section>
+
+</main>
+
+<div class="hud">
+  <div class="bar"><b id="pb"></b><span id="pr">🏃</span></div>
+  <div class="cnt" id="cnt">1 / 10</div>
+  <div class="nav"><button id="prev" aria-label="Previous">◀</button><button id="next" aria-label="Next">▶</button></div>
+</div>
+
+<script>
+/* ---------- chibi runner SVG ---------- */
+const RUNNER=`
+<svg viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+ <ellipse cx="200" cy="440" rx="110" ry="12" fill="#000" opacity=".25"/>
+ <g class="bob">
+  <!-- back arm -->
+  <g class="limb armB" style="transform-origin:150px 230px"><rect x="140" y="225" width="22" height="80" rx="11" fill="#e89f7c"/><circle cx="151" cy="308" r="14" fill="#ffd1b8"/></g>
+  <!-- back leg -->
+  <g class="limb legB" style="transform-origin:190px 330px"><rect x="177" y="322" width="28" height="56" rx="14" fill="#13463a"/>
+   <g class="limb shinB" style="transform-origin:191px 372px"><rect x="179" y="366" width="24" height="52" rx="12" fill="#13463a"/><path d="M168 416q24-20 50 0v14H168z" fill="#ff7eb6"/><rect x="168" y="426" width="50" height="7" rx="3" fill="#fff"/></g></g>
+  <!-- torso -->
+  <path d="M150 210q50-24 100 0l12 130q-62 20-124 0z" fill="#ff4d6d"/>
+  <path d="M170 215h60v22h-60z" fill="#fff" opacity=".9"/>
+  <rect x="172" y="262" width="56" height="34" rx="6" fill="#fff"/><text x="200" y="287" font-size="24" font-family="Bangers" text-anchor="middle" fill="#0b2a22">07</text>
+  <!-- front leg -->
+  <g class="limb legA" style="transform-origin:216px 330px"><rect x="202" y="322" width="28" height="56" rx="14" fill="#1b6a57"/>
+   <g class="limb shinA" style="transform-origin:216px 372px"><rect x="204" y="366" width="24" height="52" rx="12" fill="#1b6a57"/><path d="M193 416q24-20 50 0v14H193z" fill="#ffb347"/><rect x="193" y="426" width="50" height="7" rx="3" fill="#fff"/></g></g>
+  <!-- head -->
+  <g>
+   <path class="hairf" d="M120 120q-70-10-95 45q50-15 95-5z" fill="#ff7eb6"/>
+   <circle cx="200" cy="130" r="82" fill="#ffd9c2"/>
+   <!-- hair -->
+   <path d="M118 128q-10-86 82-90q92 4 82 90q-20-40-50-48-40 28-114 48z" fill="#ff7eb6"/>
+   <path d="M150 52l14 34 18-38 18 36 22-34-6 40z" fill="#ff9ccb"/>
+   <!-- headband -->
+   <rect x="120" y="92" width="160" height="16" rx="8" fill="#fff"/>
+   <circle cx="200" cy="100" r="9" fill="#ff4d6d"/>
+   <g class="band"><path d="M122 100q-50-18-95 6q45 0 62 22z" fill="#fff"/><path d="M122 100q-40 10-70 40q40-14 70-16z" fill="#ff4d6d"/></g>
+   <!-- face -->
+   <g>
+    <ellipse cx="160" cy="138" rx="19" ry="26" fill="#2a1a3d"/><ellipse cx="240" cy="138" rx="19" ry="26" fill="#2a1a3d"/>
+    <ellipse cx="160" cy="142" rx="15" ry="20" fill="#2f9bff"/><ellipse cx="240" cy="142" rx="15" ry="20" fill="#2f9bff"/>
+    <ellipse cx="160" cy="150" rx="10" ry="10" fill="#9be7ff"/><ellipse cx="240" cy="150" rx="10" ry="10" fill="#9be7ff"/>
+    <circle cx="153" cy="130" r="7" fill="#fff"/><circle cx="233" cy="130" r="7" fill="#fff"/><circle cx="168" cy="152" r="3.5" fill="#fff"/><circle cx="248" cy="152" r="3.5" fill="#fff"/>
+    <ellipse cx="130" cy="170" rx="14" ry="7" fill="#ff7eb6" opacity=".6"/><ellipse cx="270" cy="170" rx="14" ry="7" fill="#ff7eb6" opacity=".6"/>
+    <path d="M180 176q20 24 40 0z" fill="#8c1d3f"/><path d="M190 186q10 8 20 0" fill="#ff7e9e"/>
+   </g>
+  </g>
+  <!-- front arm -->
+  <g class="limb armA" style="transform-origin:250px 230px"><rect x="238" y="225" width="22" height="80" rx="11" fill="#ffd1b8"/><circle cx="249" cy="308" r="14" fill="#ffd1b8"/></g>
+ </g>
+ <!-- sweat / sparkle -->
+ <g fill="#9bffd9"><path d="M300 90q8 18 0 24q-8-6 0-24z"/><path d="M320 130q6 14 0 18q-6-4 0-18z"/></g>
+ <g fill="#ffb347"><path d="M60 80l6 14 14 6-14 6-6 14-6-14-14-6 14-6z"><animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/></path></g>
+</svg>`;
+document.getElementById('runner1').innerHTML=RUNNER;
+
+/* ---------- sakura + sparkle canvas ---------- */
+const cv=document.getElementById('fx'),cx=cv.getContext('2d');
+let W,H;function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}rs();addEventListener('resize',rs);
+const petals=[...Array(55)].map(()=>mk(true));
+function mk(init){return{x:Math.random()*W,y:init?Math.random()*H:-20,s:6+Math.random()*10,vy:.6+Math.random()*1.4,vx:-.3+Math.random()*1.2,r:Math.random()*6,vr:(Math.random()-.5)*.05,sw:Math.random()*6,c:Math.random()<.2?'#fff':'#ffb7d5'}}
+let burst=[];
+function sparkBurst(x,y){for(let i=0;i<40;i++){const a=Math.random()*6.28,v=2+Math.random()*7;burst.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,c:['#ff7eb6','#ffb347','#9bffd9','#fff'][i%4],s:3+Math.random()*5})}}
+function star(x,y,s,c,a){cx.save();cx.translate(x,y);cx.rotate(a);cx.fillStyle=c;cx.beginPath();for(let i=0;i<8;i++){const r=i%2?s*.35:s;cx.lineTo(Math.cos(i*Math.PI/4)*r,Math.sin(i*Math.PI/4)*r)}cx.fill();cx.restore()}
+function loop(t){cx.clearRect(0,0,W,H);
+ for(const p of petals){p.y+=p.vy;p.x+=p.vx+Math.sin(t/700+p.sw)*.8;p.r+=p.vr;if(p.y>H+20||p.x>W+30)Object.assign(p,mk(false),{x:Math.random()*W*1.1-W*.1});
+  cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.scale(1,.55+.45*Math.sin(t/500+p.sw));cx.fillStyle=p.c;cx.globalAlpha=.85;cx.beginPath();cx.moveTo(0,0);cx.bezierCurveTo(p.s,-p.s,p.s*1.4,p.s*.4,0,p.s);cx.bezierCurveTo(-p.s*1.4,p.s*.4,-p.s,-p.s,0,0);cx.fill();cx.restore()}
+ burst=burst.filter(b=>b.l>0);for(const b of burst){b.x+=b.vx;b.y+=b.vy;b.vy+=.15;b.l-=.018;cx.globalAlpha=Math.max(b.l,0);star(b.x,b.y,b.s,b.c,b.l*6)}cx.globalAlpha=1;
+ requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+
+/* ---------- navigation ---------- */
+const slides=[...document.querySelectorAll('.slide')],N=slides.length;let cur=0,lock=false;
+const wipe=document.getElementById('wipe');for(let i=0;i<14;i++){const e=document.createElement('i');e.style.setProperty('--n',i);wipe.appendChild(e)}
+function counters(s){s.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,f=el.dataset.fmt,suf=el.dataset.suf||'',t0=performance.now();
+  (function st(t){const k=Math.min((t-t0-700)/1600,1);const v=k<0?0:Math.round(to*(1-Math.pow(1-k,3)));el.textContent=(f?v.toLocaleString('en-US'):v)+suf;if(k<1)requestAnimationFrame(st)})(t0)})}
+function show(n){if(lock||n<0||n>=N||n===cur)return;lock=true;
+ wipe.classList.remove('go');void wipe.offsetWidth;wipe.classList.add('go');
+ setTimeout(()=>{slides[cur].classList.remove('active');cur=n;slides[cur].classList.add('active');counters(slides[cur]);upd();
+  sparkBurst(innerWidth*.5,innerHeight*.45);document.body.style.setProperty('--h',n)},450);
+ setTimeout(()=>lock=false,900)}
+function upd(){const p=cur/(N-1)*100;pb.style.width=p+'%';pr.style.left=p+'%';cnt.textContent=(cur+1)+' / '+N}
+const pb=document.getElementById('pb'),pr=document.getElementById('pr'),cnt=document.getElementById('cnt');
+document.getElementById('next').onclick=()=>show(cur+1);document.getElementById('prev').onclick=()=>show(cur-1);
+addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();show(cur+1)}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key))show(cur-1);if(e.key==='Home')show(0);if(e.key==='End')show(N-1);if(e.key==='f')document.documentElement.requestFullscreen?.()});
+let sx=0;addEventListener('touchstart',e=>sx=e.touches[0].clientX);addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>60)show(cur+(d<0?1:-1))});
+addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>40)show(cur+(e.deltaY>0?1:-1))},{passive:true});
+addEventListener('click',e=>{sparkBurst(e.clientX,e.clientY)});
+document.getElementById('finish').onclick=e=>{e.stopPropagation();for(let i=0;i<6;i++)setTimeout(()=>sparkBurst(Math.random()*innerWidth,Math.random()*innerHeight*.7),i*150)};
+/* mouse parallax on kanji */
+addEventListener('mousemove',e=>{const x=(e.clientX/innerWidth-.5)*30,y=(e.clientY/innerHeight-.5)*30;document.querySelectorAll('.kanji').forEach(k=>k.style.transform=`translate(${-x}px,${-y}px)`);document.querySelector('.speed').style.translate=`${x}px ${y}px`});
+upd();counters(slides[0]);
+</script>
+</body>
+</html>
